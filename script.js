@@ -115,35 +115,38 @@ function hideControls(wrapper) {
 
 //
 document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.iframe-wrapper').forEach(wrapper => {
-        const id = wrapper.dataset.fileId;
-        // Best-effort: try to get Drive preview thumbnail
-        const thumbUrl = `https://drive.google.com/thumbnail?id=${id}&sz=w340-h600`;
+  document.querySelectorAll('.iframe-wrapper').forEach(wrapper => {
+    const id = wrapper.dataset.fileId;
+   const thumbnail_id = wrapper.dataset.thumbId || '';
+    console.log(thumbnail_id)
+    const image_url =  wrapper.dataset.thumbUrl || (thumbnail_id ? `https://drive.google.com/thumbnail?id=${thumbnail_id}&sz=w340-h600` : '');
+    const thumbUrl = image_url || `https://drive.google.com/thumbnail?id=${id}&sz=w340-h600`;
+    console.log(thumbUrl)
+  
+    // create thumbnail image
+    const img = document.createElement('img');
+    img.src = thumbUrl;
+    img.alt = 'Video thumbnail';
+    wrapper.appendChild(img);
 
-        // create thumbnail image
-        const img = document.createElement('img');
-        img.src = thumbUrl;
-        img.alt = 'Video thumbnail';
-        wrapper.appendChild(img);
+    // play button overlay
+    const button = document.createElement('div');
+    button.className = 'play-button';
+    wrapper.appendChild(button);
 
-        // play button overlay
-        const button = document.createElement('div');
-        button.className = 'play-button';
-        wrapper.appendChild(button);
-
-        // on-click, inject the actual iframe
-        wrapper.addEventListener('click', () => {
-          if (wrapper.querySelector('iframe')) return;
-          const iframe = document.createElement('iframe');
-          iframe.width = wrapper.clientWidth;
-          iframe.height = wrapper.clientHeight;
-          iframe.src = `https://drive.google.com/file/d/${id}/preview?autoplay=1&mute=1&loop=1`;
-          iframe.frameBorder = '0';
-          iframe.allow = 'autoplay; encrypted-media';
-          iframe.allowFullscreen = true;
-          iframe.loading = 'lazy';
-          wrapper.innerHTML = '';
-          wrapper.appendChild(iframe);
-        });
-      });
+    // on-click, inject the actual iframe
+    wrapper.addEventListener('click', () => {
+      if (wrapper.querySelector('iframe')) return;
+      const iframe = document.createElement('iframe');
+      iframe.width = wrapper.clientWidth;
+      iframe.height = wrapper.clientHeight;
+      iframe.src = `https://drive.google.com/file/d/${id}/preview?autoplay=1&mute=1&loop=1`;
+      iframe.frameBorder = '0';
+      iframe.allow = 'autoplay; encrypted-media';
+      iframe.allowFullscreen = true;
+      iframe.loading = 'lazy';
+      wrapper.innerHTML = '';
+      wrapper.appendChild(iframe);
     });
+  });
+});
